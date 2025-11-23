@@ -9,4 +9,8 @@ urlpatterns = [
 
 
 
+<<<<<<< HEAD
 ]
+=======
+]
+>>>>>>> bb7d07fcd490eb146dca1abcaa6dbf21c351e570

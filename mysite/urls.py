@@ -29,5 +29,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb7d07fcd490eb146dca1abcaa6dbf21c351e570
 ]
