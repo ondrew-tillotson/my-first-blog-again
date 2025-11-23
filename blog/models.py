@@ -17,4 +17,10 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+class CSVFile(models.Model):
+        file = models.FileField(upload_to='csv_uploads/')
+        uploaded_at = models.DateTimeField(auto_now_add=True)
+
+        def __str__(self):
+            return self.file.name
 # Create your models here.
