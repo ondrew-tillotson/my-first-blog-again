@@ -1,5 +1,5 @@
 from django.shortcuts import redirect
-<<<<<<< HEAD
+
 
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
@@ -9,13 +9,11 @@ from django.utils import timezone
 
 from .models import Post # Assuming you have a Post model
 
-=======
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
 # Create your views here.
 from .models import Post # Assuming you have a Post model
->>>>>>> bb7d07fcd490eb146dca1abcaa6dbf21c351e570
 from .forms import PostForm
 
 
@@ -64,8 +62,3 @@ def post_edit(request, pk):
     else:
         form = PostForm(instance=post)
     return render(request, 'blog/post_edit.html', {'form': form})
-<<<<<<< HEAD
-# Create your views here.
-=======
-# Create your views here.
->>>>>>> bb7d07fcd490eb146dca1abcaa6dbf21c351e570
