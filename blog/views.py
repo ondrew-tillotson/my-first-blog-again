@@ -1,9 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from .models import Post # Assuming you have a Post model
 def post_list(request):
-  posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+	posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
 
-  #posts = Post.objects.all() # Fetch all posts from the database
-  return render(request, 'blog/post_list.html', {'posts': posts})
+	#posts=	Post.objects.get(pk=pk)
+
+ # posts = Post.objects.all() # Fetch all posts from the database
+	return render(request, 'blog/post_list.html', {'posts': posts})
+
+def post_detail(request,pk):
+	post = get_object_or_404(Post, pk=pk)
+	return render(request, 'blog/post_detail.html', {'post': post})
 # Create your views here.
