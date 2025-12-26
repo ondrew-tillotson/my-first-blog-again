@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-o9ol4mq3w!4n3a)0vpl)sen623c9f%133paig_awmwerdhib74
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.pythonanywhere.com','www.ohdata.org','ohdata.org']
+ALLOWED_HOSTS = ['www.ohdata.org','ohdata.org','localhost', '127.0.0.1', '.pythonanywhere.com']
 
 DATABASES = {
     'default': {
