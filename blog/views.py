@@ -8,23 +8,33 @@ from django.utils import timezone
 # Create your views here.
 
 from .models import Post # Assuming you have a Post model
-
+from .models import CSVFile
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
 # Create your views here.
 from .models import Post # Assuming you have a Post model
 from .forms import PostForm
+def home_page(request):
+	return render(request,'blog/base.html',{})
+
+#def post_list(request):
+	#posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+	#return render(request, 'blog/post_list.html', {'posts': posts})
 
 
-def post_list(request):
-	posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
 
-	#posts=	Post.objects.get(pk=pk)
+
+
+
+
+#posts=	Post.objects.get(pk=pk)
 
  # posts = Post.objects.all() # Fetch all posts from the database
-	return render(request, 'blog/post_list.html', {'posts': posts})
 
+def upload_csv(request):
+	file=get_object_or_404(CSVFile)
+	return render(request,'blog/upload_csv.html',{})
 def post_detail(request,pk):
 	post = get_object_or_404(Post, pk=pk)
 
@@ -62,3 +72,9 @@ def post_edit(request, pk):
     else:
         form = PostForm(instance=post)
     return render(request, 'blog/post_edit.html', {'form': form})
+
+
+
+
+
+
