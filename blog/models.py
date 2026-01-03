@@ -24,6 +24,9 @@ class CSVFile(models.Model):
 
         def __str__(self):
             return self.file.name
+        def upload(self):
+            self.save()
+
 # Create your models here.
 
 # HELLLO THIS IS FOR THE CSV DOWNLOAD

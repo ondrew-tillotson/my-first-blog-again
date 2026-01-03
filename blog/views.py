@@ -1,20 +1,23 @@
 from django.shortcuts import redirect
-
+import pandas as pd
 
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
-
+import io
 # Create your views here.
 
 from .models import Post # Assuming you have a Post model
 from .models import CSVFile
+
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
 # Create your views here.
 from .models import Post # Assuming you have a Post model
 from .forms import PostForm
+from .forms import UploadFileForm
+
 def home_page(request):
 	return render(request,'blog/base.html',{})
 
@@ -32,9 +35,28 @@ def home_page(request):
 
  # posts = Post.objects.all() # Fetch all posts from the database
 
-def upload_csv(request):
-	file=get_object_or_404(CSVFile)
-	return render(request,'blog/upload_csv.html',{})
+
+def upload_csv(request, *args):
+	print(args)
+	#args returns () but why
+	if request.method == 'POST':
+		form = UploadFileForm(request.POST, request.FILES)
+    # Read the file into a DataFrame
+		decoded_file = request.read().decode('utf-8')
+		#print(decoded_file)
+		df = pd.read_csv(io.StringIO(decoded_file))
+		#print(df)
+	    # Rename columns based on the user-defined mapping
+		df.rename(columns=args, inplace=True)
+
+	    # Create model instances and use bulk_create for efficiency
+		instances = [
+			CSVFile(**row) for row in df.to_dict(orient='records')
+		]
+		CSVFile.objects.bulk_create(instances)
+	else:
+		form = UploadFileForm()
+	return render(request, 'upload_csv.html', {'form': form})
 def post_detail(request,pk):
 	post = get_object_or_404(Post, pk=pk)
 
