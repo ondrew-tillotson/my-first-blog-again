@@ -37,14 +37,35 @@ def home_page(request):
 
 
 def upload_csv(request, *args):
-	print(args)
+	#print(args)
 	#args returns () but why
-	if request.method == 'POST':
-		form = UploadFileForm(request.POST, request.FILES)
+	if request.method == 'POST' and request.FILES.get('csv_file'):
+		uploaded_file = request.FILES['csv_file']
+		try:
+			csv_data = uploaded_file.read().decode('utf-8')
+			data_io = io.StringIO(csv_data)
+
+            # Read the file-like object into a pandas DataFrame
+			df = pd.read_csv(data_io)
+
+            # Now you can work with the pandas DataFrame (e.g., process data, print head)
+			print(df.head())
+            
+            # Add your processing logic here
+            # ...
+
+			return render(request, 'upload_csv.html', {})
+
+		except Exception as e:
+			return render(request, 'upload_csv.html', {})
+
+
     # Read the file into a DataFrame
+		#print(args,request)
 		decoded_file = request.read().decode('utf-8')
-		#print(decoded_file)
-		df = pd.read_csv(io.StringIO(decoded_file))
+		print(decoded_file)
+		print(io.StringIO(decoded_file).getvalue())
+		df = pd.read_csv(io.StringIO(decoded_file).getvalue())
 		#print(df)
 	    # Rename columns based on the user-defined mapping
 		df.rename(columns=args, inplace=True)
@@ -54,6 +75,8 @@ def upload_csv(request, *args):
 			CSVFile(**row) for row in df.to_dict(orient='records')
 		]
 		CSVFile.objects.bulk_create(instances)
+		form = UploadFileForm(request.POST, request.FILES)
+
 	else:
 		form = UploadFileForm()
 	return render(request, 'upload_csv.html', {'form': form})
