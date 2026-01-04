@@ -21,102 +21,43 @@ from .forms import UploadFileForm
 def home_page(request):
 	return render(request,'blog/base.html',{})
 
-#def post_list(request):
-	#posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
-	#return render(request, 'blog/post_list.html', {'posts': posts})
 
 
 
-
-
-
-
-#posts=	Post.objects.get(pk=pk)
-
- # posts = Post.objects.all() # Fetch all posts from the database
-
+#Hannah: We need to give upload_csv a new dictionary "cleaning_methods" structured like
+#"{'Dedupe': True, 'Caps names': False, 'Valid Address?':False}"
+#and it will come from whatever ui we make that allows people to select how they want it to be cleaned
 
 def upload_csv(request, *args):
-	#print(args)
-	#args returns () but why
 	if request.method == 'POST' and request.FILES.get('csv_file'):
 		uploaded_file = request.FILES['csv_file']
 		try:
 			csv_data = uploaded_file.read().decode('utf-8')
 			data_io = io.StringIO(csv_data)
-
-            # Read the file-like object into a pandas DataFrame
 			df = pd.read_csv(data_io)
 
-            # Now you can work with the pandas DataFrame (e.g., process data, print head)
-			print(df.head())
             
-            # Add your processing logic here
-            # ...
+           
+			#and then we need to cycle through cleaning_methods and pass it to functions
+			#so if 'Depupe' is True in our dictionary, we pass df to a dedupe(df) function.
+
+
+			#and then, HANNAH, huge: we pass it off to download_csv, which we need to structure 
+			#around a button that pops up after uploading the csv, which we'll need to make an html file
+			#view, and url for it.  Also I believe a DownloadFileForm model in models.py
+
+			download_csv(df)
 
 			return render(request, 'upload_csv.html', {})
 
 		except Exception as e:
 			return render(request, 'upload_csv.html', {})
-
-
-    # Read the file into a DataFrame
-		#print(args,request)
-		decoded_file = request.read().decode('utf-8')
-		print(decoded_file)
-		print(io.StringIO(decoded_file).getvalue())
-		df = pd.read_csv(io.StringIO(decoded_file).getvalue())
-		#print(df)
-	    # Rename columns based on the user-defined mapping
-		df.rename(columns=args, inplace=True)
-
-	    # Create model instances and use bulk_create for efficiency
-		instances = [
-			CSVFile(**row) for row in df.to_dict(orient='records')
-		]
-		CSVFile.objects.bulk_create(instances)
-		form = UploadFileForm(request.POST, request.FILES)
-
 	else:
 		form = UploadFileForm()
 	return render(request, 'upload_csv.html', {'form': form})
-def post_detail(request,pk):
-	post = get_object_or_404(Post, pk=pk)
 
-	#posts=	Post.objects.get(pk=pk)
-
- # posts = Post.objects.all() # Fetch all posts from the database
-	return render(request, 'blog/post_detail.html', {'post': post})
-
-def post_new(request):
-	if request.method == "POST":
-		form = PostForm(request.POST)
-		if form.is_valid():
-			post = form.save(commit=False)
-			post.author = request.user
-			post.published_date = timezone.now()
-			post.save()
-			return redirect('post_detail', pk=post.pk)
-
-
-	else:
-		form = PostForm()
-
-    #form = PostForm()
-	return render(request, 'blog/post_edit.html', {'form': form})
-def post_edit(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    if request.method == "POST":
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.published_date = timezone.now()
-            post.save()
-            return redirect('post_detail', pk=post.pk)
-    else:
-        form = PostForm(instance=post)
-    return render(request, 'blog/post_edit.html', {'form': form})
+def download_csv(df):
+	print(df.head())
 
 
 
