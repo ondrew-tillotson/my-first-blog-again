@@ -1,0 +1,37 @@
+{%extends 'blog/base.html'%}
+
+{%block content%}
+
+
+{% if user.is_authenticated %}
+
+<h1>Welcome to Oh Data!</h1>
+
+
+<p class="lead">
+  This is a webiste to help you with all your data cleaning needs :D
+</p>
+<p class="lead">
+    We are Ondrew and Hannah, 2 dudes who love data and cleaning! So what better way to combine these 2 hobbies than to make a website that CLEANS your csvs for you?
+</p>
+<p class="lead">
+    Choose between: XYZ options and upload your csv. Let us do all the cleaning and then download your csv! Pretty simple right? 
+</p>
+{% else %}
+<div class="col-md-6 offset-md-3">
+<h1>Login</h1>
+<br/>
+<form method="POST" action="{% url 'blog:home' %}">
+    {% csrf_token %}
+  <div class="mb-3">
+    <input type="text" class="form-control" name="username", placeholder="username" required>
+  </div>
+  <div class="mb-3">
+    <input type="password" class="form-control" name="password", placeholder="password" required>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+{% endif %}
+{%endblock%}

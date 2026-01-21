@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+from django.shortcuts import render,redirect
 import pandas as pd
 
 from django.shortcuts import render, get_object_or_404
@@ -8,18 +8,30 @@ import io
 # Create your views here.
 
 from .models import Post # Assuming you have a Post model
-from .models import CSVFile
+from .models import CSVFile, Record 
 
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 
 # Create your views here.
 from .models import Post # Assuming you have a Post model
-from .forms import PostForm
+from .forms import PostForm, NewForm
 from .forms import UploadFileForm
+from django.views.generic import ListView, FormView
 
-def home_page(request):
-	return render(request,'blog/base.html',{})
+from django.http import HttpResponse
+from django.urls import reverse_lazy
+from django.template import context
+from .resources import RecordResource
+from django.template.loader import get_template
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+import csv
+
+
+
+#def home_page(request):
+	#return render(request,'blog/base.html',{})
 
 
 
@@ -58,6 +70,64 @@ def upload_csv(request, *args):
 
 def download_csv(df):
 	print(df.head())
+
+
+
+
+#Download csv from sqlite db
+
+def RecordList(request):
+    queryset = Record.objects.all()
+    form = NewForm()
+    context = {'obj': queryset, 'form':form}
+    print(request.method)
+    if request.method=='POST':
+        form = NewForm(request.POST)
+        print(form.is_valid())
+        if form.is_valid():
+            dataFormat = (form.cleaned_data['category'])
+
+
+            # If User Selects CSV Format
+            if dataFormat == 'csv':
+                record_resource = RecordResource()
+                dataset = record_resource.export()
+                response = HttpResponse(dataset.csv, content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="recordzz.csv"'
+                return response
+
+            # If User Selects XLS Format
+            elif dataFormat == 'xls':
+                record_resource = RecordResource()
+                dataset = record_resource.export()
+                response = HttpResponse(dataset.xls, content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = 'attachment; filename="recordz.xls"'
+                return response
+        else:
+            print('Form Is Invalid')
+    else:
+        form = NewForm()
+    return render(request, 'download.html', context)
+
+
+#Logging in users to access tool
+def home(request):
+    records = Record.objects.all()
+    #Check to see if logging in
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        #Authenticate
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, "You have been logged in!")
+            return redirect('blog:home')
+        else:
+            messages.success(request, "There was an error :/ Try again")
+            return redirect('blog:home')
+    else:
+        return render(request, 'home.html',{'records': records})
 
 
 

@@ -29,4 +29,21 @@ class CSVFile(models.Model):
 
 # Create your models here.
 
-# HELLLO THIS IS FOR THE CSV DOWNLOAD
+# HELLLO THIS IS the model for FOR THE CSV DOWNLOAD
+
+class Record(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.CharField(max_length=50)
+    phone = models.CharField(max_length=50)
+    address =models.CharField(max_length=50)
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
+    zipcode = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return(f"{self.first_name}")
