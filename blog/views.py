@@ -1,24 +1,12 @@
-from django.shortcuts import render,redirect
-import pandas as pd
-
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render,redirect, get_object_or_404
 from django.utils import timezone
 
-import io
-# Create your views here.
+from .models import Post,CSVFile, Record # Assuming you have a Post model
+from .forms import PostForm, NewForm,UploadFileForm
 
-from .models import Post # Assuming you have a Post model
-from .models import CSVFile, Record 
 
-from django.shortcuts import render, get_object_or_404
-from django.utils import timezone
 
-# Create your views here.
-from .models import Post # Assuming you have a Post model
-from .forms import PostForm, NewForm
-from .forms import UploadFileForm
 from django.views.generic import ListView, FormView
-
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.template import context
@@ -26,7 +14,10 @@ from .resources import RecordResource
 from django.template.loader import get_template
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+
+import io
 import csv
+import pandas as pd
 
 
 
