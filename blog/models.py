@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.conf import settings
 from django.db import models
@@ -47,3 +48,14 @@ class Record(models.Model):
 
     def __str__(self):
         return(f"{self.first_name}")
+
+class MiniRecord(models.Model):
+    #uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    fname=models.CharField(max_length=50)
+    lname=models.CharField(max_length=50)
+    class Meta:
+        ordering = ['fname']
+
+    def __str__(self):
+        return(f"{self.fname}")

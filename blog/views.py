@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.utils import timezone
 
-from .models import Post,CSVFile, Record # Assuming you have a Post model
+from .models import Post,CSVFile, Record,MiniRecord # Assuming you have a Post model
 from .forms import PostForm, NewForm,UploadFileForm
+from django.core.management import call_command
 
 
 
@@ -32,15 +33,21 @@ import pandas as pd
 #and it will come from whatever ui we make that allows people to select how they want it to be cleaned
 
 def upload_csv(request, *args):
-	if request.method == 'POST' and request.FILES.get('csv_file'):
-		uploaded_file = request.FILES['csv_file']
-		try:
-			csv_data = uploaded_file.read().decode('utf-8')
-			data_io = io.StringIO(csv_data)
-			df = pd.read_csv(data_io)
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        uploaded_file = request.FILES['csv_file']
+        try:
+            csv_data = uploaded_file.read().decode('utf-8')
+            data_io = io.StringIO(csv_data)
+            reader = csv.DictReader(data_io)
 
-            
-           
+            objs = [MiniRecord(fname=row['fname'], lname=row['lname']) for row in reader]
+            #print(MiniRecord.objects.bulk_create(objs))
+
+            MiniRecord.objects.bulk_create(objs)
+            queryset = MiniRecord.objects.all()
+            #print(queryset)
+            df = pd.read_csv(data_io)         
+            #print(df)
 			#and then we need to cycle through cleaning_methods and pass it to functions
 			#so if 'Depupe' is True in our dictionary, we pass df to a dedupe(df) function.
 
@@ -48,16 +55,22 @@ def upload_csv(request, *args):
 			#and then, HANNAH, huge: we pass it off to download_csv, which we need to structure 
 			#around a button that pops up after uploading the csv, which we'll need to make an html file
 			#view, and url for it.  Also I believe a DownloadFileForm model in models.py
+            #download_csv(df)
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="{filename}.csv"'.format(filename='myname')
+            writer = csv.writer(response)
+            writer.writerow([column for column in df.columns])
+            writer.writerows(df.values.tolist())
+            #print(response)
+            return render(response, 'download.html', {})
+        except Exception as e:
+            print(e)
+            return render(request, 'download.html', {})
+    else:
+        form = UploadFileForm()
 
-			download_csv(df)
+    return render(request, 'upload_csv.html', {'form': form})
 
-			return render(request, 'upload_csv.html', {})
-
-		except Exception as e:
-			return render(request, 'upload_csv.html', {})
-	else:
-		form = UploadFileForm()
-	return render(request, 'upload_csv.html', {'form': form})
 
 def download_csv(df):
 	print(df.head())
@@ -69,6 +82,7 @@ def download_csv(df):
 
 def RecordList(request):
     queryset = Record.objects.all()
+    print(Record.objects.all())
     form = NewForm()
     context = {'obj': queryset, 'form':form}
     print(request.method)
@@ -119,9 +133,3 @@ def home(request):
             return redirect('blog:home')
     else:
         return render(request, 'home.html',{'records': records})
-
-
-
-
-
-
